@@ -26,3 +26,13 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
+
+Route::group(['middleware' => ['auth:sanctum', config('jetstream.auth_session'), 'verified']], function() {
+
+    Route::get('/dashboard', function() {
+        return view('dashboard');
+    })->name('dashboard');
+    Route::get('/pages', function() {
+        return view('admin.pages');
+    })->name('pages');
+});
