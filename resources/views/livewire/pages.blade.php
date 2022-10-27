@@ -5,10 +5,54 @@
         </x-jet-button>
     </div>
 
+    <table class="w-full divide-y divide-gray-200">
+        <thead>
+            <tr>
+                <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Link</th>
+                <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Content</th>
+                <th class="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            @if ($data->count())
+                @foreach ($data as $item)
+                    <tr>
+                        <td class="px-6 py-4 text-sm whitespace-nowrap">{{$item->id}}</td>
+                        <td class="px-6 py-4 text-sm whitespace-nowrap">{{$item->title}}</td>
+                        <td class="px-6 py-4 text-sm whitespace-nowrap">
+                            <a
+                                class="text-indigo-600 hover:text-indigo-900"
+                                target="_blank"
+                                href="{{URL::to('/'.$item->slug)}}"
+                            >
+                                {{$item->slug}}
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 text-sm whitespace-nowrap">{!!$item->content!!}</td>
+                        <td class="px-6 py-4 text-sm text-right">
+                            <x-jet-button wire:click="updateShowModal({{$item->id}})">
+                                {{__('Update')}}
+                            </x-jet-button>
+                            <x-jet-danger-button wire:click="deleteShowModal({{$item->id}})">
+                                {{__('Delete')}}
+                            </x-jet-danger-button>
+                        </td>
+                    </tr>
+                @endforeach
+            @else
+                    <tr>
+                        <td class="px-6 py-4 text-sm whitespace-nowrap" colspan="4">No result found</td>
+                    </tr>
+            @endif
 
+        </tbody>
+    </table>
+    {{$data->links()}}
     <x-jet-dialog-modal wire:model="modelFormVisible">
         <x-slot name="title">
-            {{ __('Save Page') }}
+            {{ __('Save Page') }} {{$modelId}}
         </x-slot>
 
         <x-slot name="content">
@@ -57,9 +101,36 @@
                 {{ __('Cancel') }}
             </x-jet-secondary-button>
 
-            <x-jet-button class="ml-3" wire:click="create" wire:loading.attr="disabled">
-                {{ __('Save') }}
-            </x-jet-button>
+            @if ($modelId)
+                <x-jet-button class="ml-3" wire:click="update" wire:loading.attr="disabled">
+                    {{ __('Update') }}
+                </x-jet-button>
+            @else
+                <x-jet-button class="ml-3" wire:click="create" wire:loading.attr="disabled">
+                    {{ __('Save') }}
+                </x-jet-button>
+            @endif
+
+        </x-slot>
+    </x-jet-dialog-modal>
+
+    <x-jet-dialog-modal wire:model="modalConfirmDelete">
+        <x-slot name="title">
+            {{ __('Delete Page') }}
+        </x-slot>
+
+        <x-slot name="content">
+            {{ __('Are you sure you want to delete your page? Once page is deleted.') }}
+        </x-slot>
+
+        <x-slot name="footer">
+            <x-jet-secondary-button wire:click="$toggle('modalConfirmDelete')" wire:loading.attr="disabled">
+                {{ __('Cancel') }}
+            </x-jet-secondary-button>
+
+            <x-jet-danger-button class="ml-3" wire:click="delete({{$modelId}})" wire:loading.attr="disabled">
+                {{ __('Delete') }}
+            </x-jet-danger-button>
         </x-slot>
     </x-jet-dialog-modal>
 </div>
